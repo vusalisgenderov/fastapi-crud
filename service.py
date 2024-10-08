@@ -31,8 +31,8 @@ def change_user_password(user_name:str,data:userchangescheme,db:Session):
     user = db.query(User).filter_by(username=user_name,password=data.password).first()
     if not user:
         raise UserNottFoundException()
-    db.query(User).update({"password":data.new_password})
+    db.query(User).filter_by(username=user_name,password=data.password).update({"password":data.new_password})
     db.commit()
-
+    
     return {"msg": "user is updated"}
     
