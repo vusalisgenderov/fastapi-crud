@@ -1,7 +1,7 @@
 from models import User
 from scheme import Usercreateshcema,Userdeletescheme,userchangescheme
 from sqlalchemy.orm import Session
-from exceptions import UserNottFoundException
+from exceptions import *
 import psycopg2
 from setting import DATABASE_URL
 import bcrypt
@@ -11,7 +11,7 @@ def create_user_in_db(data:Usercreateshcema,db:Session):
     new_user=User(username=data.username,password=hashed_password.decode("utf-8"))
     user=db.query(User).filter_by(username=new_user.username).first()
     if user:
-        raise UserNottFoundException()
+        raise UserIsExists()
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
