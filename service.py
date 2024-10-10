@@ -4,15 +4,11 @@ from sqlalchemy.orm import Session
 from exceptions import UserNottFoundException
 import psycopg2
 from setting import DATABASE_URL
-import hashlib
-
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
-
+import bcrypt
 
 def create_user_in_db(data:Usercreateshcema,db:Session):
-    hashed_password=hash_password(data.password)
-    new_user=User(username=data.username,password=hashed_password)
+    hashed_password=bcrypt.hashpw(data.password.encode("utf-8"),bcrypt.gensalt())
+    new_user=User(username=data.username,password=hashed_password.decode("utf-8"))
     user=db.query(User).filter_by(username=new_user.username).first()
     if user:
         raise UserNottFoundException()
@@ -37,13 +33,17 @@ def get_current_user(*, username: str, db):
     return {"msg":user.username}
 
 def change_user_password(user_name:str,data:userchangescheme,db:Session):
-    hashed_password=hash_password(data.password)
-    hashed_password1=hash_password(data.new_password)
+    hashed_password1=bcrypt.hashpw(data.new_password.encode("utf-8"),bcrypt.gensalt())
+    user = db.query(User).filter_by(username=user_name).first()
 
-    user = db.query(User).filter_by(username=user_name,password=hashed_password).first()
+  
     if not user:
         raise UserNottFoundException()
-    db.query(User).filter_by(username=user_name,password=hashed_password).update({"password":hashed_password1})
+
+    if not bcrypt.checkpw(data.password.encode("utf-8"),user.password.encode("utf-8")):
+        raise UserNottFoundException()
+    
+    db.query(User).filter_by(username=user_name).update({"password":hashed_password1.decode("utf-8")})
     db.commit()
     
     return {"msg": "user is updated"}
