@@ -2,7 +2,7 @@ from fastapi import FastAPI,Depends
 from db import get_db
 from sqlalchemy.orm import Session
 from scheme import Usercreateshcema,Userdeletescheme,userchangescheme
-from service import create_user_in_db,delete_user_in_db,get_current_user,change_user_password
+from service import *
 app = FastAPI()
 
 
@@ -29,3 +29,9 @@ def get_user(username: str, db: Session = Depends(get_db)):
 def update_user(username:str,item:userchangescheme,db: Session = Depends(get_db)):
     message = change_user_password(user_name=username,data=item,db=db)
     return message
+
+@app.delete("/all_user")
+def reset_my_base():
+    msg=reset_base()
+    return {"msg":"base reseted"}
+
