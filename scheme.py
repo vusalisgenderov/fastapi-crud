@@ -17,3 +17,9 @@ class userchangescheme(BaseModel):
     new_password:str
     class Config:
         extra="forbid"
+
+class ResetUsers(BaseModel):
+    username:str
+    password:str
+    class Config:
+        extra = "forbid"

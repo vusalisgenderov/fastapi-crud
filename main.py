@@ -1,7 +1,7 @@
 from fastapi import FastAPI,Depends
 from db import get_db
 from sqlalchemy.orm import Session
-from scheme import Usercreateshcema,Userdeletescheme,userchangescheme
+from scheme import *
 from service import *
 app = FastAPI()
 
@@ -31,7 +31,7 @@ def update_user(username:str,item:userchangescheme,db: Session = Depends(get_db)
     return message
 
 @app.delete("/all_user")
-def reset_my_base():
-    msg=reset_base()
-    return {"msg":"base reseted"}
+def reset_my_base(item:ResetUsers,db: Session = Depends(get_db)):
+    msg=reset_base(data=item,db=db)
+    return msg
 

@@ -1,5 +1,5 @@
 from models import User
-from scheme import Usercreateshcema,Userdeletescheme,userchangescheme
+from scheme import *
 from sqlalchemy.orm import Session
 from exceptions import *
 import psycopg2
@@ -49,7 +49,13 @@ def change_user_password(user_name:str,data:userchangescheme,db:Session):
     return {"msg": "user is updated"}
 
 
-def reset_base():
+def reset_base(data:ResetUsers,db:Session):
+    user = db.query(User).filter_by(username=data.username).first()
+    if not user:
+        raise UserNottFoundException
+    if not bcrypt.checkpw(password=data.password.encode("utf-8"),hashed_password=user.password.encode("utf-8")):
+        raise UserNottFoundException
+
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
     cur.execute("DELETE FROM users;")
